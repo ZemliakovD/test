@@ -20,6 +20,8 @@
     <button type="submit">Сгенерировать и скачать документ</button>
   </form>
 
+  <!-- Подключаем библиотеки -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.18.1/docxtemplater.js"></script>
   <script>
     document.getElementById('myForm').addEventListener('submit', function(event) {
@@ -38,15 +40,22 @@
         <p>Ваше сообщение: {message}</p>
       `;
       
-      // Заменяем переменные в шаблоне
-      const doc = new window.docxtemplater();
-      doc.loadZip(new JSZip(template));
+      // Загружаем шаблон с помощью JSZip
+      const zip = new JSZip();
+      zip.load(template, { base64: false });
+      
+      // Создаём экземпляр docxtemplater
+      const doc = new window.docxtemplater().loadZip(zip);
+      
+      // Подставляем данные в шаблон
       doc.setData({
         name,
         email,
         message
       });
+      
       try {
+        // Рендерим документ
         doc.render();
       } catch (error) {
         console.log(error);
